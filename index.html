@@ -81,15 +81,14 @@
                 const username = $('#username').val();
                 const password = $('#password').val();
 
-                // Validate credentials (this can be enhanced)
-                if (username && password) {
-                    // Store the username in localStorage (it will persist even after closing the browser)
-                    localStorage.setItem("loggedInUser", username);
-                    
-                    // Redirect to the expense page
-                    window.location.href = "expense.html";
+                // Validate credentials (Check if username and password match)
+                const storedPassword = localStorage.getItem(username); // Get the stored password for the username
+                if (storedPassword && storedPassword === password) {
+                    // If the username exists and the password matches, log the user in
+                    localStorage.setItem("loggedInUser", username); // Store logged-in user
+                    window.location.href = "expense.html"; // Redirect to the expense page
                 } else {
-                    alert("Please enter both username and password.");
+                    alert("Invalid username or password. Please try again.");
                 }
             });
         });
