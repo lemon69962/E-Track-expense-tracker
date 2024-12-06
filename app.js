@@ -38,6 +38,7 @@ $(document).ready(function () {
         resetForm();  // Reset the form for new data
         loadExpenses();  // Reload the expense table
         updateSummary();  // Update the total summary
+        updateMonthlySummary(); // Ensure the chart is updated
     });
 
     // Function to load expenses from localStorage and display in the table
@@ -46,7 +47,10 @@ $(document).ready(function () {
         let expenseTableBody = $('#expenseTable tbody');
         expenseTableBody.empty();  // Clear existing rows
 
+        // Sort expenses by date (most recent first)
         if (Array.isArray(expenses)) {
+            expenses.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sorting by date in descending order
+            
             expenses.forEach((expense, index) => {
                 if (!isNaN(expense.amount) && expense.amount > 0) {
                     expenseTableBody.append(`
@@ -190,6 +194,7 @@ $(document).ready(function () {
         saveExpenses(expenses);  // Save updated expenses to localStorage
         loadExpenses();  // Reload the expenses table
         updateSummary();  // Update the summary
+        updateMonthlySummary(); // Update the chart
     };
 
     // Edit expense function
@@ -212,6 +217,7 @@ $(document).ready(function () {
             localStorage.removeItem(loggedInUser);  // Remove all expenses for the user
             loadExpenses();  // Reload the table
             updateSummary();  // Reset the summary
+            updateMonthlySummary(); // Update the chart
             alert('All records have been deleted!');
         }
     });
