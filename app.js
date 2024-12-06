@@ -75,10 +75,14 @@ $(document).ready(function () {
 
     // Function to get expenses from localStorage for the logged-in user
     function getExpenses() {
-        const userExpenses = localStorage.getItem(loggedInUser);
+        const loggedInUser = localStorage.getItem("loggedInUser"); // Get the logged-in username
+        if (!loggedInUser) {
+            return []; // Return empty if no user is logged in
+        }
+        const userExpenses = localStorage.getItem(loggedInUser); // Fetch the expenses for the logged-in user
         if (userExpenses) {
             try {
-                const expenses = JSON.parse(userExpenses);
+                const expenses = JSON.parse(userExpenses); // Parse the JSON string into an array
                 if (Array.isArray(expenses)) {
                     return expenses;
                 }
@@ -86,12 +90,17 @@ $(document).ready(function () {
                 console.error("Error parsing expenses data", e);
             }
         }
-        return []; // Return empty array if no data or invalid format
+        return []; // Return empty array if no expenses or invalid format
     }
 
-    // Function to save expenses to localStorage
+    // Function to save expenses to localStorage for the logged-in user
     function saveExpenses(expenses) {
-        localStorage.setItem(loggedInUser, JSON.stringify(expenses));
+        const loggedInUser = localStorage.getItem("loggedInUser"); // Ensure logged-in user is retrieved
+        if (loggedInUser) {
+            localStorage.setItem(loggedInUser, JSON.stringify(expenses)); // Save expenses with the user's username
+        } else {
+            console.error("No user logged in. Can't save expenses.");
+        }
     }
 
     // Function to update the expense summary (total expenses)
@@ -175,6 +184,7 @@ $(document).ready(function () {
     // Logout function
     $('#logoutBtn').click(function () {
         localStorage.removeItem("loggedInUser");  // Remove logged-in user from localStorage
+        editingIndex = null; // Reset editing index when logging out
         window.location.href = "index.html";  // Redirect to login page
     });
 
