@@ -1,61 +1,61 @@
-let editingIndex = null; // Variable to store the index of the expense being edited
+let editingIndex = null;
 
-// Check if a user is logged in. If not, redirect to login page
-const loggedInUser = sessionStorage.getItem("loggedInUser");
+// Check if a user is logged in using localStorage
+const loggedInUser = localStorage.getItem("loggedInUser");
 if (!loggedInUser) {
     alert("You must log in first!");
-    window.location.href = "index.html"; // Redirect to login page if not logged in
+    window.location.href = "index.html"; // Redirect to login page
 }
 
 $(document).ready(function () {
-    loadExpenses(); // Load the saved expenses when the page is loaded
-    updateSummary(); // Update the summary of total expenses
-    populateMonthDropdown(); // Populate the month dropdown for filtering
+    loadExpenses();  // Load expenses from localStorage
+    updateSummary();  // Update the total expenses summary
+    populateMonthDropdown();  // Populate the month dropdown for filtering
 
     // Add/Edit expense button click handler
     $('#addExpenseBtn').click(function () {
-        const amount = parseFloat($('#expenseAmount').val()); // Get the expense amount
-        const date = $('#expenseDate').val(); // Get the expense date
-        const description = $('#expenseDescription').val(); // Get the expense description
-        const type = $('#expenseType').val(); // Get the expense type (e.g., Food, Transport)
+        const amount = parseFloat($('#expenseAmount').val());
+        const date = $('#expenseDate').val();
+        const description = $('#expenseDescription').val();
+        const type = $('#expenseType').val();
 
-        // Validate inputs to ensure they are valid
+        // Validate inputs
         if (isNaN(amount) || amount <= 0 || !date || !description || !type) {
             alert("Please fill in all fields correctly! Make sure all the fields have values");
             return; // Exit early if validation fails
         }
 
-        const expense = { // Create an expense object
+        const expense = {
             amount: amount,
             date: date,
             description: description,
             type: type
         };
 
-        let expenses = getExpenses(); // Retrieve the list of expenses from localStorage
+        let expenses = getExpenses(); // Get expenses from localStorage
 
         if (editingIndex !== null) {
-            expenses[editingIndex] = expense; // Update the existing expense if we're editing
+            expenses[editingIndex] = expense; // Update existing expense
         } else {
-            expenses.push(expense); // Otherwise, add a new expense to the array
+            expenses.push(expense); // Add new expense
         }
 
-        saveExpenses(expenses); // Save the updated expenses to localStorage
-        resetForm(); // Reset the form fields
-        loadExpenses(); // Reload the table with updated expenses
-        updateSummary(); // Update the expense summary with the new total
+        saveExpenses(expenses);  // Save updated expenses to localStorage
+        resetForm();  // Reset the form for new data
+        loadExpenses();  // Reload the expense table
+        updateSummary();  // Update the total summary
     });
 
-    // Function to load expenses and display them in the table
+    // Function to load expenses from localStorage and display in the table
     function loadExpenses() {
-        let expenses = getExpenses(); // Get the expenses from localStorage
+        let expenses = getExpenses();  // Get expenses from localStorage
         let expenseTableBody = $('#expenseTable tbody');
-        expenseTableBody.empty(); // Clear any existing rows in the table
+        expenseTableBody.empty();  // Clear existing rows
 
-        // Check if expenses is an array, and render each expense in the table
+        // Ensure expenses is an array
         if (Array.isArray(expenses)) {
             expenses.forEach((expense, index) => {
-                if (!isNaN(expense.amount) && expense.amount > 0) { // Ensure expense amount is valid
+                if (!isNaN(expense.amount) && expense.amount > 0) {
                     expenseTableBody.append(`
                         <tr>
                             <td>RM ${expense.amount.toFixed(2)}</td>
@@ -73,80 +73,75 @@ $(document).ready(function () {
         }
     }
 
-    // Function to retrieve expenses from localStorage for the logged-in user
+    // Function to get expenses from localStorage for the logged-in user
     function getExpenses() {
-        const userExpenses = localStorage.getItem(loggedInUser); // Get the user's expenses from localStorage
-        // If expenses exist, parse and return them, otherwise return an empty array
+        const userExpenses = localStorage.getItem(loggedInUser);
         if (userExpenses) {
             try {
                 const expenses = JSON.parse(userExpenses);
                 if (Array.isArray(expenses)) {
-                    return expenses; // Return the parsed expenses array
+                    return expenses;
                 }
             } catch (e) {
-                console.error("Error parsing expenses data", e); // Handle error if data is corrupted
+                console.error("Error parsing expenses data", e);
             }
         }
-        return []; // Return an empty array if no valid data is found
+        return []; // Return empty array if no data or invalid format
     }
 
-    // Function to save expenses back into localStorage
+    // Function to save expenses to localStorage
     function saveExpenses(expenses) {
-        localStorage.setItem(loggedInUser, JSON.stringify(expenses)); // Save expenses as a JSON string
+        localStorage.setItem(loggedInUser, JSON.stringify(expenses));
     }
 
-    // Function to update the total expenses summary
+    // Function to update the expense summary (total expenses)
     function updateSummary() {
-        let expenses = getExpenses(); // Get all expenses
+        let expenses = getExpenses();
 
-        // Ensure expenses is an array before proceeding
         if (Array.isArray(expenses)) {
-            let total = expenses.reduce((sum, expense) => sum + expense.amount, 0); // Calculate the total expenses
-            $('#totalExpenses').text(`Total Expenses: RM ${total.toFixed(2) || '0.00'}`); // Update the displayed total
+            let total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            $('#totalExpenses').text(`Total Expenses: RM ${total.toFixed(2) || '0.00'}`);
         } else {
-            $('#totalExpenses').text("Total Expenses: RM 0"); // If no expenses, show 0
+            $('#totalExpenses').text("Total Expenses: RM 0");
         }
     }
 
-    // Function to populate the month dropdown dynamically with month names
+    // Populate the month dropdown dynamically
     function populateMonthDropdown() {
         let monthSelect = $('#monthSelect');
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         
-        // Loop through months and append them as options in the dropdown
         months.forEach((month, index) => {
             monthSelect.append(new Option(month, index + 1));
         });
     }
 
-    // Update monthly summary based on selected month
+    // Update monthly summary
     window.updateMonthlySummary = function () {
-        const selectedMonth = $('#monthSelect').val(); // Get the selected month from the dropdown
-        const expenses = getExpenses(); // Get all expenses
+        const selectedMonth = $('#monthSelect').val();
+        const expenses = getExpenses();
 
-        // Ensure expenses is an array before filtering
         if (Array.isArray(expenses)) {
             let filteredExpenses = expenses.filter(expense => {
-                const expenseDate = new Date(expense.date); // Convert expense date to Date object
-                const expenseMonth = expenseDate.getMonth(); // Get the month of the expense
-                const selectedMonthIndex = parseInt(selectedMonth) - 1; // Convert selected month to index
-                return selectedMonth === "all" || expenseMonth === selectedMonthIndex; // Filter by month or show all
+                const expenseDate = new Date(expense.date);
+                const expenseMonth = expenseDate.getMonth();
+                const selectedMonthIndex = parseInt(selectedMonth) - 1;
+                return selectedMonth === "all" || expenseMonth === selectedMonthIndex;
             });
 
             if (filteredExpenses.length === 0) {
-                $('#noRecordsMessage').show(); // Show "no records" message if no expenses for selected month
-                $('#expenseChart').hide(); // Hide the chart if there are no expenses
-                $('#totalExpenses').text("Total Expenses: RM 0"); // Set total to 0
+                $('#noRecordsMessage').show();
+                $('#expenseChart').hide();
+                $('#totalExpenses').text("Total Expenses: RM 0");
             } else {
-                $('#noRecordsMessage').hide(); // Hide "no records" message if there are expenses
-                $('#expenseChart').show(); // Show the chart
+                $('#noRecordsMessage').hide();
+                $('#expenseChart').show();
 
                 const expenseData = filteredExpenses.reduce((acc, expense) => {
-                    acc[expense.type] = (acc[expense.type] || 0) + expense.amount; // Group expenses by type
+                    acc[expense.type] = (acc[expense.type] || 0) + expense.amount;
                     return acc;
                 }, {});
 
-                // Prepare data for the pie chart
                 const chartData = {
                     labels: Object.keys(expenseData),
                     datasets: [{
@@ -157,10 +152,9 @@ $(document).ready(function () {
                     }]
                 };
 
-                // Render the pie chart
                 const ctx = document.getElementById('expenseChart').getContext('2d');
                 if (window.myPieChart) {
-                    window.myPieChart.destroy(); // Destroy previous chart if it exists
+                    window.myPieChart.destroy();
                 }
                 window.myPieChart = new Chart(ctx, {
                     type: 'pie',
@@ -172,7 +166,6 @@ $(document).ready(function () {
                     }
                 });
 
-                // Update the total for filtered expenses
                 let total = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
                 $('#totalExpenses').text(`Total Expenses: RM ${total.toFixed(2)}`);
             }
@@ -181,58 +174,57 @@ $(document).ready(function () {
 
     // Logout function
     $('#logoutBtn').click(function () {
-        sessionStorage.removeItem("loggedInUser"); // Remove the logged-in user from sessionStorage
-        window.location.href = "index.html"; // Redirect to the login page
+        localStorage.removeItem("loggedInUser");  // Remove logged-in user from localStorage
+        window.location.href = "index.html";  // Redirect to login page
     });
 
-    // Confirm delete function for a specific expense
+    // Confirm delete function
     window.confirmDelete = function (index) {
         if (confirm("Are you sure you want to delete this expense?")) {
-            deleteExpense(index); // Call deleteExpense if the user confirms
+            deleteExpense(index);
         }
     };
 
-    // Function to delete an expense
+    // Delete expense function
     window.deleteExpense = function (index) {
-        let expenses = getExpenses(); // Get the list of expenses
-        expenses.splice(index, 1); // Remove the expense at the given index
-        saveExpenses(expenses); // Save the updated expenses back to localStorage
-        loadExpenses(); // Reload expenses to the table
-        updateSummary(); // Update the total expense summary
+        let expenses = getExpenses();
+        expenses.splice(index, 1);  // Remove the expense from the array
+        saveExpenses(expenses);  // Save updated expenses to localStorage
+        loadExpenses();  // Reload the expenses table
+        updateSummary();  // Update the summary
     };
 
-    // Function to edit an expense
+    // Edit expense function
     window.editExpense = function (index) {
-        let expenses = getExpenses(); // Get the list of expenses
-        const expense = expenses[index]; // Get the specific expense to edit
+        let expenses = getExpenses();
+        const expense = expenses[index];
 
-        // Pre-fill the form with the expense data
         $('#expenseAmount').val(expense.amount);
         $('#expenseDate').val(expense.date);
         $('#expenseDescription').val(expense.description);
         $('#expenseType').val(expense.type);
 
-        editingIndex = index; // Set the editingIndex to the selected expense index
-        $('#addExpenseBtn').text('Save Changes'); // Change the button text to "Save Changes"
+        editingIndex = index;
+        $('#addExpenseBtn').text('Save Changes');
     };
 
     // Clear all records function
     $('#clearAllRecordsBtn').click(function () {
         if (confirm("Are you sure you want to delete all records?")) {
-            localStorage.removeItem(loggedInUser); // Remove all expenses from localStorage for the logged-in user
-            loadExpenses(); // Reload expenses (will be empty)
-            updateSummary(); // Update the summary (will show 0)
+            localStorage.removeItem(loggedInUser);  // Remove all expenses for the user
+            loadExpenses();  // Reload the table
+            updateSummary();  // Reset the summary
             alert('All records have been deleted!');
         }
     });
 
     // Function to reset the form and button
     function resetForm() {
-        $('#expenseAmount').val(''); // Clear the amount field
-        $('#expenseDate').val(''); // Clear the date field
-        $('#expenseDescription').val(''); // Clear the description field
-        $('#expenseType').val('Food'); // Reset the type to "Food"
-        editingIndex = null; // Reset the editing index
-        $('#addExpenseBtn').text('Add Expense'); // Reset button text to "Add Expense"
+        $('#expenseAmount').val('');
+        $('#expenseDate').val('');
+        $('#expenseDescription').val('');
+        $('#expenseType').val('Food');
+        editingIndex = null;
+        $('#addExpenseBtn').text('Add Expense');
     }
 });

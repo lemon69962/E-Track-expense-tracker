@@ -67,6 +67,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            // Check if user is already logged in
+            const loggedInUser = localStorage.getItem("loggedInUser");
+            if (loggedInUser) {
+                // If user is already logged in, redirect to the expenses page
+                window.location.href = "expense.html";
+            }
+
+            // Handle form submission
             $('#loginForm').submit(function (e) {
                 e.preventDefault();
 
@@ -75,8 +83,8 @@
 
                 // Validate credentials (this can be enhanced)
                 if (username && password) {
-                    // Store the username in sessionStorage (so it persists across pages)
-                    sessionStorage.setItem("loggedInUser", username);
+                    // Store the username in localStorage (it will persist even after closing the browser)
+                    localStorage.setItem("loggedInUser", username);
                     
                     // Redirect to the expense page
                     window.location.href = "expense.html";
