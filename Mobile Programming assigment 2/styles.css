@@ -1,0 +1,51 @@
+/* Custom styles for the Expense Tracker */
+
+/* Style for the expense summary */
+#totalExpenses {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: green;
+}
+
+/* Form styling */
+form .form-control {
+    margin-bottom: 10px;
+}
+
+/* Table styling */
+table {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Buttons styling with hover effects */
+button:hover {
+    opacity: 0.8;
+}
+
+/* Make buttons fill available space */
+.btn {
+    width: 100%;
+    padding: 10px;
+}
+#expenseChart {
+    max-width: 500px;  /* Limit the max width */
+    max-height: 500px; /* Limit the max height */
+    margin: 0 auto;    /* Center the pie chart */
+}
+
+
+/* Responsive Design */
+@media (max-width: 576px) {
+    .container {
+        padding: 10px;
+    }
+
+    h1, h2, h3 {
+        font-size: 1.5em;
+    }
+
+    button {
+        width: auto; /* Buttons will be smaller on small screens */
+    }
+}
