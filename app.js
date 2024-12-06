@@ -25,13 +25,7 @@ $(document).ready(function () {
             return; // Exit early if validation fails
         }
 
-        const expense = {
-            amount: amount,
-            date: date,
-            description: description,
-            type: type
-        };
-
+        const expense = { amount: amount, date: date, description: description, type: type };
         let expenses = getExpenses(); // Get expenses from localStorage
 
         if (editingIndex !== null) {
@@ -52,7 +46,6 @@ $(document).ready(function () {
         let expenseTableBody = $('#expenseTable tbody');
         expenseTableBody.empty();  // Clear existing rows
 
-        // Ensure expenses is an array
         if (Array.isArray(expenses)) {
             expenses.forEach((expense, index) => {
                 if (!isNaN(expense.amount) && expense.amount > 0) {
@@ -73,31 +66,29 @@ $(document).ready(function () {
         }
     }
 
-    // Function to get expenses from localStorage for the logged-in user
+    // Get expenses from localStorage for the logged-in user
     function getExpenses() {
-        const loggedInUser = localStorage.getItem("loggedInUser"); // Get the logged-in username
-        if (!loggedInUser) {
-            return []; // Return empty if no user is logged in
-        }
-        const userExpenses = localStorage.getItem(loggedInUser); // Fetch the expenses for the logged-in user
-        if (userExpenses) {
-            try {
-                const expenses = JSON.parse(userExpenses); // Parse the JSON string into an array
-                if (Array.isArray(expenses)) {
-                    return expenses;
+        const loggedInUser = localStorage.getItem("loggedInUser");
+        if (loggedInUser) {
+            const userExpenses = localStorage.getItem(loggedInUser);
+            if (userExpenses) {
+                try {
+                    const expenses = JSON.parse(userExpenses);
+                    return Array.isArray(expenses) ? expenses : [];
+                } catch (e) {
+                    console.error("Error parsing expenses data", e);
+                    return [];
                 }
-            } catch (e) {
-                console.error("Error parsing expenses data", e);
             }
         }
-        return []; // Return empty array if no expenses or invalid format
+        return []; // Return empty if no expenses or invalid format
     }
 
-    // Function to save expenses to localStorage for the logged-in user
+    // Save expenses to localStorage for the logged-in user
     function saveExpenses(expenses) {
-        const loggedInUser = localStorage.getItem("loggedInUser"); // Ensure logged-in user is retrieved
+        const loggedInUser = localStorage.getItem("loggedInUser");
         if (loggedInUser) {
-            localStorage.setItem(loggedInUser, JSON.stringify(expenses)); // Save expenses with the user's username
+            localStorage.setItem(loggedInUser, JSON.stringify(expenses)); // Save expenses for the user
         } else {
             console.error("No user logged in. Can't save expenses.");
         }
@@ -106,7 +97,6 @@ $(document).ready(function () {
     // Function to update the expense summary (total expenses)
     function updateSummary() {
         let expenses = getExpenses();
-
         if (Array.isArray(expenses)) {
             let total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
             $('#totalExpenses').text(`Total Expenses: RM ${total.toFixed(2) || '0.00'}`);
@@ -129,7 +119,6 @@ $(document).ready(function () {
     window.updateMonthlySummary = function () {
         const selectedMonth = $('#monthSelect').val();
         const expenses = getExpenses();
-
         if (Array.isArray(expenses)) {
             let filteredExpenses = expenses.filter(expense => {
                 const expenseDate = new Date(expense.date);
@@ -145,7 +134,6 @@ $(document).ready(function () {
             } else {
                 $('#noRecordsMessage').hide();
                 $('#expenseChart').show();
-
                 const expenseData = filteredExpenses.reduce((acc, expense) => {
                     acc[expense.type] = (acc[expense.type] || 0) + expense.amount;
                     return acc;

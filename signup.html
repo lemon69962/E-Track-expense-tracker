@@ -66,20 +66,26 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Handle the signup form submission
-            $('#signupForm').submit(function(event) {
+            $('#signupForm').submit(function (event) {
                 event.preventDefault();
-                
-                const username = $('#newUsername').val();
-                const password = $('#newPassword').val();
 
-                // Check if the username already exists in localStorage
-                if (localStorage.getItem(username)) {
+                const username = $('#newUsername').val().trim().toLowerCase(); // Normalize username to lowercase
+                const password = $('#newPassword').val().trim();
+
+                // Retrieve the existing user credentials array
+                const userCredentials = JSON.parse(localStorage.getItem("userCredentials")) || [];
+
+                // Check if the username already exists
+                const userExists = userCredentials.some(user => user.username === username);
+
+                if (userExists) {
                     alert("Username already taken. Please choose another username.");
                 } else {
-                    // Save the new user data in localStorage
-                    localStorage.setItem(username, password); // Store the username and password
+                    // Save the new user credentials in localStorage
+                    userCredentials.push({ username: username, password: password });
+                    localStorage.setItem("userCredentials", JSON.stringify(userCredentials));
                     alert("Registration successful!");
                     window.location.href = "index.html";  // Redirect to login page after successful registration
                 }

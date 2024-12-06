@@ -67,28 +67,29 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            // Check if user is already logged in
-            const loggedInUser = localStorage.getItem("loggedInUser");
-            if (loggedInUser) {
-                // If user is already logged in, redirect to the expenses page
-                window.location.href = "expense.html";
-            }
-
             // Handle form submission
             $('#loginForm').submit(function (e) {
                 e.preventDefault();
 
-                const username = $('#username').val();
-                const password = $('#password').val();
+                const username = $('#username').val().trim().toLowerCase(); // Normalize username to lowercase
+                const password = $('#password').val().trim();
 
-                // Validate credentials (Check if username and password match)
-                const storedPassword = localStorage.getItem(username); // Get the stored password for the username
-                if (storedPassword && storedPassword === password) {
-                    // If the username exists and the password matches, log the user in
-                    localStorage.setItem("loggedInUser", username); // Store logged-in user
-                    window.location.href = "expense.html"; // Redirect to the expense page
+                // Retrieve the stored user data from localStorage
+                const userCredentials = JSON.parse(localStorage.getItem("userCredentials")) || [];
+
+                // Find the user from the credentials array
+                const userData = userCredentials.find(user => user.username === username);
+
+                if (userData) {
+                    // Check if the password matches
+                    if (userData.password === password) {
+                        localStorage.setItem("loggedInUser", username); // Store the logged-in username
+                        window.location.href = "expense.html"; // Redirect to the expense page
+                    } else {
+                        alert("Invalid password.");
+                    }
                 } else {
-                    alert("Invalid username or password. Please try again.");
+                    alert("Invalid username or password.");
                 }
             });
         });
