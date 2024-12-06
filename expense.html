@@ -7,12 +7,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Log Out Button Positioned at Top Right */
+        /* Log Out Button Positioned at Bottom */
         #logoutBtn {
-            position: absolute; /* Position the button relative to the container */
-            top: 20px;
-            right: 20px;
-            width: 120px; /* Set a fixed width for the logout button */
+            width: 100%; /* Make it span the full width */
+            margin-top: 20px; /* Add some space from the summary section */
         }
 
         /* Container to avoid overlap with the Log Out button */
@@ -68,9 +66,6 @@
 </head>
 <body>
     <div class="container mt-4">
-        <!-- Log Out Button (Positioned Top Right) -->
-        <button id="logoutBtn" class="btn btn-warning mb-3">Log Out</button>
-
         <h1 class="text-center mb-4">E-track Expense Tracker</h1>
 
         <!-- Form to Add Expense -->
@@ -107,6 +102,9 @@
         <!-- View Summary Button placed under the other buttons -->
         <button id="viewSummaryBtn" class="btn btn-info">View Summary</button>
 
+        <!-- Log Out Button placed after the View Summary Button -->
+        <button id="logoutBtn" class="btn btn-warning">Log Out</button>
+        
         <!-- Expense List Table -->
         <h2 class="mt-4">Expense History</h2>
         <div id="expenseTableWrapper">
